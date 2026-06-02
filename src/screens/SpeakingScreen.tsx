@@ -13,9 +13,12 @@ import {
   missingWords,
 } from "../speech/speech";
 import { speaking } from "../data/content";
+import { shuffle } from "../util";
+const SESSION_SIZE = 10;
 import { colors, font, spacing } from "../theme";
 
 export function SpeakingScreen({ onBack }: { onBack: () => void }) {
+  const [session] = useState(() => shuffle(speaking).slice(0, SESSION_SIZE));
   const [i, setI] = useState(0);
   const [listening, setListening] = useState(false);
   const [heard, setHeard] = useState("");
@@ -25,7 +28,7 @@ export function SpeakingScreen({ onBack }: { onBack: () => void }) {
   const recRef = useRef<RecognitionHandle | null>(null);
   const supported = isRecognitionAvailable();
 
-  const item = speaking[i];
+  const item = session[i];
 
   useEffect(() => () => stopRec(), []);
 
@@ -59,7 +62,7 @@ export function SpeakingScreen({ onBack }: { onBack: () => void }) {
   }
 
   function next() {
-    if (i + 1 >= speaking.length) setDone(true);
+    if (i + 1 >= session.length) setDone(true);
     else {
       setI(i + 1);
       setHeard("");
@@ -80,7 +83,7 @@ export function SpeakingScreen({ onBack }: { onBack: () => void }) {
     return (
       <Screen>
         <ActivityHeader title="Say It" onBack={onBack} />
-        <DoneCard score={passes} total={speaking.length} onRestart={restart} onBack={onBack} />
+        <DoneCard score={passes} total={session.length} onRestart={restart} onBack={onBack} />
       </Screen>
     );
   }
@@ -91,7 +94,7 @@ export function SpeakingScreen({ onBack }: { onBack: () => void }) {
 
   return (
     <Screen>
-      <ActivityHeader title="Say It" onBack={onBack} step={i + 1} total={speaking.length} />
+      <ActivityHeader title="Say It" onBack={onBack} step={i + 1} total={session.length} />
       <ScrollView contentContainerStyle={{ paddingBottom: spacing.xl }}>
         <Card style={{ marginTop: spacing.md }}>
           <Body style={{ color: colors.textSoft }}>Read this out loud:</Body>
@@ -146,7 +149,7 @@ export function SpeakingScreen({ onBack }: { onBack: () => void }) {
         )}
 
         <Button
-          title={i + 1 >= speaking.length ? "Finish" : score != null && passed ? "Next" : "Skip / Next"}
+          title={i + 1 >= session.length ? "Finish" : score != null && passed ? "Next" : "Skip / Next"}
           variant={passed ? "primary" : "neutral"}
           onPress={next}
           style={{ marginTop: spacing.lg }}

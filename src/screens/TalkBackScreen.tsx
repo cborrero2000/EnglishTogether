@@ -10,6 +10,8 @@ import {
   RecognitionHandle,
 } from "../speech/speech";
 import { conversations } from "../data/content";
+import { shuffle } from "../util";
+const SESSION_SIZE = 3;
 import { colors, font, radius, spacing } from "../theme";
 
 type Status = "idle" | "listening" | "good" | "retry";
@@ -23,6 +25,7 @@ function isAcceptable(accept: string[], said: string): boolean {
 }
 
 export function TalkBackScreen({ onBack }: { onBack: () => void }) {
+  const [session] = useState(() => shuffle(conversations).slice(0, SESSION_SIZE));
   const [convoIdx, setConvoIdx] = useState(0);
   const [step, setStep] = useState(0);
   const [status, setStatus] = useState<Status>("idle");
@@ -32,7 +35,7 @@ export function TalkBackScreen({ onBack }: { onBack: () => void }) {
   const recRef = useRef<RecognitionHandle | null>(null);
   const supported = isRecognitionAvailable();
 
-  const convo = conversations[convoIdx];
+  const convo = session[convoIdx];
   const current = convo.steps[step];
 
   // Speak each prompt as we arrive at it.
@@ -97,7 +100,7 @@ export function TalkBackScreen({ onBack }: { onBack: () => void }) {
 
   function nextConversation() {
     stopSpeaking();
-    if (convoIdx + 1 >= conversations.length) {
+    if (convoIdx + 1 >= session.length) {
       onBack();
     } else {
       setConvoIdx((c) => c + 1);
@@ -123,7 +126,7 @@ export function TalkBackScreen({ onBack }: { onBack: () => void }) {
           <Body style={{ color: colors.textSoft, marginTop: spacing.xs, textAlign: "center" }}>
             You had a whole conversation in English. Wonderful!
           </Body>
-          {convoIdx + 1 < conversations.length ? (
+          {convoIdx + 1 < session.length ? (
             <Button title="Next conversation" onPress={nextConversation} style={{ marginTop: spacing.lg, alignSelf: "stretch" }} />
           ) : (
             <Button title="Back to menu" onPress={onBack} style={{ marginTop: spacing.lg, alignSelf: "stretch" }} />

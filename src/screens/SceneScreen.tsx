@@ -5,11 +5,14 @@ import { ActivityHeader } from "../components/ActivityHeader";
 import { DoneCard } from "../components/DoneCard";
 import { speak, stopSpeaking } from "../speech/speech";
 import { scenes } from "../data/content";
+import { shuffle } from "../util";
+const SESSION_SIZE = 5;
 import { colors, font, radius, spacing } from "../theme";
 
 const AVATARS = ["🧑", "👩", "👨", "🧓", "👱‍♀️", "👨‍🦰"];
 
 export function SceneScreen({ onBack }: { onBack: () => void }) {
+  const [session] = useState(() => shuffle(scenes).slice(0, SESSION_SIZE));
   const [i, setI] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [activeLine, setActiveLine] = useState(-1);
@@ -19,7 +22,7 @@ export function SceneScreen({ onBack }: { onBack: () => void }) {
   const [done, setDone] = useState(false);
   const pulse = useRef(new Animated.Value(1)).current;
 
-  const item = scenes[i];
+  const item = session[i];
 
   useEffect(() => {
     const t = setTimeout(playScene, 400);
@@ -73,7 +76,7 @@ export function SceneScreen({ onBack }: { onBack: () => void }) {
   }
 
   function next() {
-    if (i + 1 >= scenes.length) setDone(true);
+    if (i + 1 >= session.length) setDone(true);
     else {
       setI(i + 1);
       setPicked(null);
@@ -95,7 +98,7 @@ export function SceneScreen({ onBack }: { onBack: () => void }) {
     return (
       <Screen>
         <ActivityHeader title="Watch & Decide" onBack={onBack} />
-        <DoneCard score={score} total={scenes.length} onRestart={restart} onBack={onBack} />
+        <DoneCard score={score} total={session.length} onRestart={restart} onBack={onBack} />
       </Screen>
     );
   }
@@ -104,7 +107,7 @@ export function SceneScreen({ onBack }: { onBack: () => void }) {
 
   return (
     <Screen>
-      <ActivityHeader title="Watch & Decide" onBack={onBack} step={i + 1} total={scenes.length} />
+      <ActivityHeader title="Watch & Decide" onBack={onBack} step={i + 1} total={session.length} />
       <ScrollView contentContainerStyle={{ paddingBottom: spacing.xl }}>
         <H2 style={{ marginTop: spacing.md }}>{item.title}</H2>
         <Body style={{ color: colors.textSoft, marginTop: spacing.xs }}>{item.situation}</Body>
@@ -150,7 +153,7 @@ export function SceneScreen({ onBack }: { onBack: () => void }) {
             <Body style={{ color: picked === item.answer ? colors.correct : colors.wrong, fontWeight: "700" }}>
               {picked === item.answer ? "✓ Great choice!" : "Not the best reply — see the highlighted one."}
             </Body>
-            <Button title={i + 1 >= scenes.length ? "See results" : "Next"} onPress={next} style={{ marginTop: spacing.md }} />
+            <Button title={i + 1 >= session.length ? "See results" : "Next"} onPress={next} style={{ marginTop: spacing.md }} />
           </View>
         )}
       </ScrollView>

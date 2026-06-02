@@ -6,8 +6,12 @@ import { DoneCard } from "../components/DoneCard";
 import { speak, stopSpeaking } from "../speech/speech";
 import { dialogs } from "../data/content";
 import { colors, font, radius, spacing } from "../theme";
+import { shuffle } from "../util";
+
+const SESSION_SIZE = 4;
 
 export function DialogScreen({ onBack }: { onBack: () => void }) {
+  const [session] = useState(() => shuffle(dialogs).slice(0, SESSION_SIZE));
   const [i, setI] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [activeLine, setActiveLine] = useState(-1);
@@ -15,7 +19,7 @@ export function DialogScreen({ onBack }: { onBack: () => void }) {
   const [score, setScore] = useState(0);
   const [done, setDone] = useState(false);
 
-  const item = dialogs[i];
+  const item = session[i];
 
   useEffect(() => {
     const t = setTimeout(playDialog, 400);
@@ -54,7 +58,7 @@ export function DialogScreen({ onBack }: { onBack: () => void }) {
   }
 
   function next() {
-    if (i + 1 >= dialogs.length) setDone(true);
+    if (i + 1 >= session.length) setDone(true);
     else {
       setI(i + 1);
       setPicked(null);
@@ -74,14 +78,14 @@ export function DialogScreen({ onBack }: { onBack: () => void }) {
     return (
       <Screen>
         <ActivityHeader title="Dialog & Question" onBack={onBack} />
-        <DoneCard score={score} total={dialogs.length} onRestart={restart} onBack={onBack} />
+        <DoneCard score={score} total={session.length} onRestart={restart} onBack={onBack} />
       </Screen>
     );
   }
 
   return (
     <Screen>
-      <ActivityHeader title="Dialog & Question" onBack={onBack} step={i + 1} total={dialogs.length} />
+      <ActivityHeader title="Dialog & Question" onBack={onBack} step={i + 1} total={session.length} />
       <ScrollView contentContainerStyle={{ paddingBottom: spacing.xl }}>
         <H2 style={{ marginTop: spacing.md }}>{item.title}</H2>
 
@@ -121,7 +125,7 @@ export function DialogScreen({ onBack }: { onBack: () => void }) {
             <Body style={{ color: picked === item.answer ? colors.correct : colors.wrong, fontWeight: "700" }}>
               {picked === item.answer ? "✓ That's right!" : "Not quite — see the highlighted answer."}
             </Body>
-            <Button title={i + 1 >= dialogs.length ? "See results" : "Next"} onPress={next} style={{ marginTop: spacing.md }} />
+            <Button title={i + 1 >= session.length ? "See results" : "Next"} onPress={next} style={{ marginTop: spacing.md }} />
           </View>
         )}
       </ScrollView>

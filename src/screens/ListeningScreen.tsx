@@ -5,16 +5,19 @@ import { ActivityHeader } from "../components/ActivityHeader";
 import { DoneCard } from "../components/DoneCard";
 import { speak, stopSpeaking } from "../speech/speech";
 import { listening } from "../data/content";
+
+const SESSION_SIZE = 8;
 import { colors, spacing } from "../theme";
 import { shuffle } from "../util";
 
 export function ListeningScreen({ onBack }: { onBack: () => void }) {
+  const [session] = useState(() => shuffle(listening).slice(0, SESSION_SIZE));
   const [i, setI] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [done, setDone] = useState(false);
 
-  const item = listening[i];
+  const item = session[i];
   // Shuffle the options once per question.
   const options = useMemo(() => shuffle(item.options), [i]);
   const answerIndex = options.indexOf(item.say);
@@ -34,7 +37,7 @@ export function ListeningScreen({ onBack }: { onBack: () => void }) {
   }
 
   function next() {
-    if (i + 1 >= listening.length) setDone(true);
+    if (i + 1 >= session.length) setDone(true);
     else {
       setI(i + 1);
       setPicked(null);
@@ -43,6 +46,7 @@ export function ListeningScreen({ onBack }: { onBack: () => void }) {
 
   function restart() {
     stopSpeaking();
+    // session is re-created when the component unmounts/remounts; just reset index
     setI(0);
     setPicked(null);
     setScore(0);
@@ -53,14 +57,14 @@ export function ListeningScreen({ onBack }: { onBack: () => void }) {
     return (
       <Screen>
         <ActivityHeader title="Listen & Choose" onBack={onBack} />
-        <DoneCard score={score} total={listening.length} onRestart={restart} onBack={onBack} />
+        <DoneCard score={score} total={session.length} onRestart={restart} onBack={onBack} />
       </Screen>
     );
   }
 
   return (
     <Screen>
-      <ActivityHeader title="Listen & Choose" onBack={onBack} step={i + 1} total={listening.length} />
+      <ActivityHeader title="Listen & Choose" onBack={onBack} step={i + 1} total={session.length} />
       <ScrollView contentContainerStyle={{ paddingBottom: spacing.xl }}>
         <Card style={{ marginTop: spacing.md, alignItems: "center" }}>
           <Body style={{ color: colors.textSoft, textAlign: "center" }}>
@@ -98,7 +102,7 @@ export function ListeningScreen({ onBack }: { onBack: () => void }) {
               {picked === answerIndex ? "✓ Correct!" : "Not quite — the highlighted one is right."}
             </Body>
             <Button
-              title={i + 1 >= listening.length ? "See results" : "Next"}
+              title={i + 1 >= session.length ? "See results" : "Next"}
               onPress={next}
               style={{ marginTop: spacing.md }}
             />
