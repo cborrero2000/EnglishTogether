@@ -1,0 +1,35 @@
+appId: com.cborr.englishtogether
+name: "Learn"
+---
+- launchApp:
+    clearState: false
+- tapOn: "Learn"
+- assertVisible: "Learn"
+- assertVisible: "Which sentence did you hear?"
+- assertVisible: "Play again"
+- takeScreenshot: "learn_01_listen"
+# Tap a choice
+- tapOn:
+    point: "50%,68%"
+- assertVisible: "Next"
+- takeScreenshot: "learn_02_answered"
+- tapOn: "Next"
+# Speak step
+- assertVisible: "Hear it"
+- takeScreenshot: "learn_03_speak"
+- tapOn: "Hear it"
+# Skip speak step using the button (avoid arrow character matching issues)
+- tapOn:
+    point: "50%,82%"
+# Read step
+- assertVisible: "What does this mean?"
+- takeScreenshot: "learn_04_read"
+- tapOn:
+    point: "50%,65%"
+- assertVisible: "Next"
+- tapOn: "Next"
+# Write/build step
+- assertVisible: "Tap the words in the right order:"
+- takeScreenshot: "learn_05_build"
+- tapOn: "Back to menu"
+- assertVisible: "English Together"

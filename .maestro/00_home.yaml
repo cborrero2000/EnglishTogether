@@ -1,0 +1,24 @@
+appId: com.cborr.englishtogether
+name: "Home Screen"
+---
+- launchApp:
+    clearState: false
+# Check top elements (visible before any scroll)
+- assertVisible: "English Together"
+- assertVisible: "STUDY"
+- assertVisible: "Learn"
+- assertVisible: "Recall"
+- assertVisible: "Daily Review"
+- assertVisible: "Voice"
+- takeScreenshot: "home_01_top"
+# Scroll down to see practice tiles
+- scroll
+- assertVisible: "PRACTICE"
+- assertVisible: "Listen & Choose"
+- assertVisible: "Say It"
+- assertVisible: "Dialog & Question"
+- takeScreenshot: "home_02_practice"
+- scroll
+- assertVisible: "Talk Back"
+- assertVisible: "Watch & Decide"
+- takeScreenshot: "home_03_bottom"

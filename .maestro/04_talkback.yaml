@@ -1,0 +1,20 @@
+appId: com.cborr.englishtogether
+name: "Talk Back"
+---
+- launchApp:
+    clearState: false
+- scroll
+- scroll
+- scroll
+- assertVisible: "Talk Back"
+- tapOn: "Talk Back"
+- assertVisible: "The other person says:"
+- assertVisible: "You could say:"
+- assertVisible: "Hear it again"
+- takeScreenshot: "talkback_01_initial"
+- waitForAnimationToEnd:
+    timeout: 6000
+- tapOn: "Hear it again"
+- takeScreenshot: "talkback_02_replayed"
+- tapOn: "Back to menu"
+- assertVisible: "English Together"

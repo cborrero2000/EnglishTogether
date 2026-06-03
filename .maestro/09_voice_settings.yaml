@@ -1,0 +1,20 @@
+appId: com.cborr.englishtogether
+name: "Voice Settings"
+---
+- launchApp:
+    clearState: false
+# Tap voice button by coordinate (top-right of home screen)
+- tapOn:
+    point: "82%,12%"
+- assertVisible: "Voice"
+- assertVisible: "Choose the voice you like best. Tap one to hear a sample."
+- assertVisible: "Hear a sample"
+- assertVisible: "RECOMMENDED"
+- assertVisible: "Automatic"
+- takeScreenshot: "voice_01_top"
+- tapOn: "Hear a sample"
+- takeScreenshot: "voice_02_sample_played"
+- scroll
+- takeScreenshot: "voice_03_scrolled"
+- tapOn: "Back to menu"
+- assertVisible: "English Together"

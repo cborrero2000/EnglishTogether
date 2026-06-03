@@ -1,0 +1,20 @@
+appId: com.cborr.englishtogether
+name: "Say It"
+---
+- launchApp:
+    clearState: false
+- scroll
+- scroll
+- assertVisible: "Say It"
+- tapOn: "Say It"
+- assertVisible: "Read this out loud:"
+- assertVisible: "Hear it"
+- assertVisible: "Tap and speak"
+- takeScreenshot: "sayit_01_initial"
+- tapOn: "Hear it"
+- takeScreenshot: "sayit_02_heard"
+- tapOn:
+    point: "50%,80%"
+- takeScreenshot: "sayit_03_next"
+- tapOn: "Back to menu"
+- assertVisible: "English Together"

@@ -40,3 +40,7 @@ yarn-error.*
 
 # build logs
 android/build-log*.txt
+
+# Maestro test screenshots (generated artifacts)
+*.png
+!assets/*.png

@@ -1,0 +1,12 @@
+appId: com.cborr.englishtogether
+name: "Recall"
+---
+- launchApp:
+    clearState: false
+- tapOn: "Recall"
+- takeScreenshot: "recall_01_screen"
+# The screen shows either an empty state or an active session depending on progress
+- assertVisible: "Recall"
+- takeScreenshot: "recall_02_confirmed"
+- tapOn: "Back to menu"
+- assertVisible: "English Together"

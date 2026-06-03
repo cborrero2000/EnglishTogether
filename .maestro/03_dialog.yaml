@@ -1,0 +1,26 @@
+appId: com.cborr.englishtogether
+name: "Dialog & Question"
+---
+- launchApp:
+    clearState: false
+- scroll
+- scroll
+- assertVisible: "Dialog & Question"
+- tapOn: "Dialog & Question"
+- assertVisible: "Dialog & Question"
+- takeScreenshot: "dialog_01_initial"
+# Dialog has 4 lines × ~2-3s each — wait up to 20s for auto-play to finish
+- waitForAnimationToEnd:
+    timeout: 20000
+- assertVisible: "Play the conversation"
+- takeScreenshot: "dialog_02_ready"
+- scroll
+- takeScreenshot: "dialog_03_choices"
+- tapOn:
+    point: "50%,50%"
+- takeScreenshot: "dialog_04_answered"
+- assertVisible: "Next"
+- tapOn: "Next"
+- takeScreenshot: "dialog_05_next"
+- tapOn: "Back to menu"
+- assertVisible: "English Together"

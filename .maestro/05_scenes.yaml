@@ -1,0 +1,25 @@
+appId: com.cborr.englishtogether
+name: "Watch & Decide"
+---
+- launchApp:
+    clearState: false
+- scroll
+- scroll
+- scroll
+- assertVisible: "Watch & Decide"
+- tapOn: "Watch & Decide"
+- assertVisible: "Watch & Decide"
+- assertVisible: "Play scene"
+- takeScreenshot: "scenes_01_initial"
+- tapOn: "Play scene"
+- waitForAnimationToEnd:
+    timeout: 8000
+- assertVisible: "Watch again"
+- scroll
+- takeScreenshot: "scenes_02_choices"
+- tapOn:
+    point: "50%,50%"
+- takeScreenshot: "scenes_03_answered"
+- assertVisible: "Next"
+- tapOn: "Back to menu"
+- assertVisible: "English Together"

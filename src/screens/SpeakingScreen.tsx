@@ -98,7 +98,7 @@ export function SpeakingScreen({ onBack }: { onBack: () => void }) {
       <ScrollView contentContainerStyle={{ paddingBottom: spacing.xl }}>
         <Card style={{ marginTop: spacing.md }}>
           <Body style={{ color: colors.textSoft }}>Read this out loud:</Body>
-          <Text style={styles.target}>{item.text}</Text>
+          <Text style={styles.target} accessibilityLabel={`Say: ${item.text}`}>{item.text}</Text>
           <Button
             title="Hear it"
             icon="🔊"
@@ -111,10 +111,10 @@ export function SpeakingScreen({ onBack }: { onBack: () => void }) {
         {supported ? (
           <>
             <Button
-              title={listening ? "Listening… tap to stop" : "Tap and speak"}
-              icon={listening ? "🔴" : "🎤"}
+              title={listening ? "Listening… tap to stop" : "🎤  Tap and speak"}
               variant={listening ? "accent" : "primary"}
               onPress={listening ? stopRec : startListening}
+              accessibilityLabel={listening ? "Stop listening" : "Tap to record your voice"}
               style={{ marginTop: spacing.lg }}
             />
             {(heard !== "" || score != null) && (
@@ -149,8 +149,9 @@ export function SpeakingScreen({ onBack }: { onBack: () => void }) {
         )}
 
         <Button
-          title={i + 1 >= session.length ? "Finish" : score != null && passed ? "Next" : "Skip / Next"}
+          title={i + 1 >= session.length ? "Finish" : score != null && passed ? "Next →" : "Practice this later →"}
           variant={passed ? "primary" : "neutral"}
+          accessibilityLabel={i + 1 >= session.length ? "Finish session" : passed ? "Next sentence" : "Skip and practice this later"}
           onPress={next}
           style={{ marginTop: spacing.lg }}
         />

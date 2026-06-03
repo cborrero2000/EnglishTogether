@@ -1,0 +1,11 @@
+appId: com.cborr.englishtogether
+name: "Daily Review"
+---
+- launchApp:
+    clearState: false
+- tapOn: "Daily Review"
+- takeScreenshot: "review_01_screen"
+- assertVisible: "Daily Review"
+- takeScreenshot: "review_02_confirmed"
+- tapOn: "Back to menu"
+- assertVisible: "English Together"

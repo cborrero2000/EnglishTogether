@@ -1,0 +1,27 @@
+appId: com.cborr.englishtogether
+name: "Listen & Choose"
+---
+- launchApp:
+    clearState: false
+- tapOn: "Listen & Choose"
+- assertVisible: "Listen & Choose"
+- assertVisible: "Listen carefully, then choose the sentence you heard."
+- assertVisible: "Which did you hear?"
+- assertVisible: "Play again"
+- assertVisible: "Slower"
+- takeScreenshot: "listen_01_initial"
+# Tap Play again — verifies TTS button works
+- tapOn: "Play again"
+- takeScreenshot: "listen_02_replayed"
+# Tap Slower
+- tapOn: "Slower"
+- takeScreenshot: "listen_03_slower"
+# Select a choice
+- tapOn:
+    point: "50%,65%"
+- takeScreenshot: "listen_04_choice_selected"
+- assertVisible: "Next"
+- tapOn: "Next"
+- takeScreenshot: "listen_05_next_question"
+- tapOn: "Back to menu"
+- assertVisible: "English Together"

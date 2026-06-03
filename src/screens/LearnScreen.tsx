@@ -299,6 +299,6 @@ const STEP_TONES: Record<Step, "neutral"|"good"|"bad"> = {
 };
 
 const styles = StyleSheet.create({
-  topicRow: { flexDirection: "row", gap: spacing.sm, marginTop: spacing.md, flexWrap: "wrap" },
+  topicRow: { flexDirection: "row", gap: spacing.sm, marginTop: spacing.md, flexWrap: "wrap", paddingRight: spacing.md },
   target: { fontSize: font.big, fontWeight: "800", color: colors.text, marginTop: spacing.sm, lineHeight: font.big * 1.35 },
 });
