@@ -191,42 +191,70 @@ export function speak(text: string, opts?: SpeakOpts) {
 function speakWeb(text: string, opts?: SpeakOpts) {
   const synth = (globalThis as any).speechSynthesis as SpeechSynthesis | undefined;
   if (!synth) return;
+
+  // Always cancel first to clear any queued utterances.
   synth.cancel();
-  const u = new (globalThis as any).SpeechSynthesisUtterance(text) as SpeechSynthesisUtterance;
-  const id = opts?.voiceId ?? resolveVoiceId(opts?.voice);
-  const v = id ? webVoices.find((x) => x.voiceURI === id) : null;
-  if (v) {
-    u.voice = v;
-    u.lang = v.lang;
-  } else {
-    u.lang = "en-US";
-  }
-  u.rate = opts?.rate ?? 0.97; // close to natural; the "Slower" button passes a lower value
-  u.pitch = 1.0;
-  if (opts?.onStart) u.onstart = opts.onStart;
-  u.onend = () => opts?.onDone?.();
-  u.onerror = () => opts?.onDone?.();
-  synth.speak(u);
+
+  // Chrome bug: after cancel(), the synthesis engine can get stuck in a "paused"
+  // state where subsequent speak() calls are silently dropped. Resuming it first
+  // and giving it a short tick to settle prevents this.
+  if (synth.paused) synth.resume();
+
+  // 50ms is enough for the cancel + resume cycle to complete in Chrome before we
+  // start a new utterance. Without this, "Play again" / "Watch again" often produces
+  // no audio on the second and subsequent presses.
+  setTimeout(() => {
+    // Re-resolve the voice inside the timeout in case voices reloaded.
+    const id = opts?.voiceId ?? resolveVoiceId(opts?.voice);
+    const v = id ? webVoices.find((x) => x.voiceURI === id) : null;
+    const u = new (globalThis as any).SpeechSynthesisUtterance(text) as SpeechSynthesisUtterance;
+    if (v) {
+      u.voice = v;
+      u.lang = v.lang;
+    } else {
+      u.lang = "en-US";
+    }
+    u.rate = opts?.rate ?? 0.97;
+    u.pitch = 1.0;
+    if (opts?.onStart) u.onstart = opts.onStart;
+    u.onend = () => opts?.onDone?.();
+    u.onerror = () => opts?.onDone?.();
+    synth.speak(u);
+  }, 50);
 }
 
 function speakNative(text: string, opts?: SpeakOpts) {
+  // On Android, Speech.stop() is asynchronous — the TTS engine needs a moment to
+  // fully reset before it can accept a new utterance. Calling speak() immediately
+  // after stop() causes the engine to silently drop the request after the first play.
+  // A 100ms delay is imperceptible to the user but gives the engine time to settle.
   Speech.stop();
   const id = opts?.voiceId ?? resolveVoiceId(opts?.voice);
-  Speech.speak(text, {
-    language: "en-US",
-    voice: id ?? undefined,
-    rate: opts?.rate ?? 0.97,
-    pitch: 1.0,
-    onStart: opts?.onStart,
-    onDone: opts?.onDone,
-    onStopped: opts?.onDone,
-    onError: opts?.onDone,
-  });
+  setTimeout(() => {
+    Speech.speak(text, {
+      language: "en-US",
+      voice: id ?? undefined,
+      rate: opts?.rate ?? 0.97,
+      pitch: 1.0,
+      onStart: opts?.onStart,
+      onDone: opts?.onDone,
+      onStopped: opts?.onDone,
+      onError: opts?.onDone,
+    });
+  }, 100);
 }
 
 export function stopSpeaking() {
-  if (Platform.OS === "web") (globalThis as any).speechSynthesis?.cancel();
-  else Speech.stop();
+  if (Platform.OS === "web") {
+    const synth = (globalThis as any).speechSynthesis;
+    if (synth) {
+      synth.cancel();
+      // Resume immediately after cancel so the engine stays ready for the next speak().
+      if (synth.paused) synth.resume();
+    }
+  } else {
+    Speech.stop();
+  }
 }
 
 /* ================================================================== */
