@@ -32,9 +32,12 @@
         {
           "microphonePermission": "English Together uses the microphone to check your speaking.",
           "speechRecognitionPermission": "English Together uses speech recognition to check what you say.",
-          "androidSpeechServicePackages": ["com.google.android.googlequicksearchbox"]
+          "androidSpeechServicePackages": [
+            "com.google.android.googlequicksearchbox"
+          ]
         }
-      ]
+      ],
+      "expo-video"
     ]
   }
 }

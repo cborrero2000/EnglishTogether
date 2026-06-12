@@ -3,9 +3,11 @@ export type ScreenName =
   | "learn"
   | "recall"
   | "review"
+  | "progress"
   | "listening"
   | "speaking"
   | "dialog"
   | "talkback"
   | "scenes"
-  | "settings";
+  | "settings"
+  | "onboarding";

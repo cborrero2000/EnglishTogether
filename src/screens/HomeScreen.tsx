@@ -5,50 +5,36 @@ import { md, isLargeScreen } from "../theme";
 import { ScreenName } from "../navigation";
 import { initProgress, learnedCount, dueCount } from "../progress/store";
 import { phrases } from "../data/phrases";
+import { useLanguage } from "../i18n/useLanguage";
+import { StringKey } from "../i18n/strings";
 
 type TileConfig = {
   key: ScreenName;
   icon: string;
-  title: string;
-  desc: string;
+  titleKey: StringKey;
+  descKey: StringKey;
   accentColor?: string;
 };
 
 const SECTION_LEARN: TileConfig[] = [
-  {
-    key: "learn",
-    icon: "🌱",
-    title: "Learn",
-    desc: "Listen → Speak → Read → Build. The full sensory lesson.",
-    accentColor: md.colors.primary,
-  },
-  {
-    key: "recall",
-    icon: "🧠",
-    title: "Recall",
-    desc: "Test your memory. Reconstruct phrases from their meaning.",
-    accentColor: "#6B48C8",
-  },
-  {
-    key: "review",
-    icon: "☀️",
-    title: "Daily Review",
-    desc: "Keep phrases fresh. A short review of what you have learned.",
-    accentColor: md.colors.tertiary,
-  },
+  { key: "learn",    icon: "🌱", titleKey: "tileLearnTitle",    descKey: "tileLearnDesc",    accentColor: md.colors.primary },
+  { key: "recall",   icon: "🧠", titleKey: "tileRecallTitle",   descKey: "tileRecallDesc",   accentColor: "#6B48C8" },
+  { key: "review",   icon: "☀️", titleKey: "tileReviewTitle",   descKey: "tileReviewDesc",   accentColor: md.colors.tertiary },
+  { key: "progress", icon: "📈", titleKey: "tileProgressTitle", descKey: "tileProgressDesc", accentColor: "#3F6FB0" },
 ];
 
 const SECTION_PRACTICE: TileConfig[] = [
-  { key: "listening", icon: "👂", title: "Listen & Choose", desc: "Hear a sentence, pick the one you heard." },
-  { key: "speaking",  icon: "🎤", title: "Say It",          desc: "Read it out loud and check your speaking." },
-  { key: "dialog",    icon: "💬", title: "Dialog & Question", desc: "Hear a short talk, then answer a question." },
-  { key: "talkback",  icon: "🔁", title: "Talk Back",       desc: "Have a real conversation. Answer out loud." },
-  { key: "scenes",    icon: "🎬", title: "Watch & Decide",  desc: "Watch a scene, choose the best reply." },
+  { key: "listening", icon: "👂", titleKey: "tileListeningTitle", descKey: "tileListeningDesc" },
+  { key: "speaking",  icon: "🎤", titleKey: "tileSpeakingTitle",  descKey: "tileSpeakingDesc" },
+  { key: "dialog",    icon: "💬", titleKey: "tileDialogTitle",    descKey: "tileDialogDesc" },
+  { key: "talkback",  icon: "🔁", titleKey: "tileTalkbackTitle",  descKey: "tileTalkbackDesc" },
+  { key: "scenes",    icon: "🎬", titleKey: "tileScenesTitle",    descKey: "tileScenesDesc" },
 ];
 
 export function HomeScreen({ go }: { go: (s: ScreenName) => void }) {
   const [learned, setLearned] = useState(0);
   const [due, setDue] = useState(0);
+  const { t } = useLanguage();
 
   useEffect(() => {
     initProgress().then(() => {
@@ -67,68 +53,66 @@ export function HomeScreen({ go }: { go: (s: ScreenName) => void }) {
         {/* ── Header ────────────────────────────────────── */}
         <View style={styles.header}>
           <View style={styles.headerRow}>
-            <H1 style={styles.appTitle}>English Together</H1>
+            <H1 style={styles.appTitle}>{t("appTitle")}</H1>
             <Pressable
               onPress={() => go("settings")}
               accessibilityRole="button"
-              accessibilityLabel="Voice"
+              accessibilityLabel={t("voiceButton")}
               android_ripple={md.ripple(md.colors.onSurface)}
               style={({ pressed }) => [
                 styles.voiceBtn,
                 pressed && Platform.OS !== "android" && { opacity: 0.8 },
               ]}
             >
-              <Text style={styles.voiceBtnText}>🔊 Voice</Text>
+              <Text style={styles.voiceBtnText}>{t("voiceButton")}</Text>
             </Pressable>
           </View>
-          <Body style={styles.subtitle}>
-            Practice listening and speaking, one step at a time.
-          </Body>
+          <Body style={styles.subtitle}>{t("appSubtitle")}</Body>
         </View>
 
         {/* ── Progress stats ────────────────────────────── */}
         {learned > 0 && (
           <View style={styles.statsRow} accessibilityRole="summary"
-            accessibilityLabel={`${learned} phrases learned, ${due} due today`}>
+            accessibilityLabel={`${learned} ${t("statLearned")}, ${due} ${t("statDueToday")}`}>
             <View style={styles.stat}>
               <Text style={styles.statNum}>{learned}</Text>
-              <Text style={styles.statLabel}>learned</Text>
+              <Text style={styles.statLabel}>{t("statLearned")}</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.stat}>
               <Text style={[styles.statNum, due > 0 && styles.statNumDue]}>{due}</Text>
-              <Text style={styles.statLabel}>due today</Text>
+              <Text style={styles.statLabel}>{t("statDueToday")}</Text>
             </View>
             {due > 0 && (
               <Pressable
                 onPress={() => go("review")}
                 accessibilityRole="button"
-                accessibilityLabel={`${due} phrases due for review. Tap to start.`}
+                accessibilityLabel={`${due} ${t("statDueToday")}. ${t("reviewNow")}`}
                 android_ripple={md.ripple(md.colors.onTertiary)}
                 style={({ pressed }) => [
                   styles.reviewBtn,
                   pressed && Platform.OS !== "android" && { opacity: 0.8 },
                 ]}
               >
-                <Text style={styles.reviewBtnText}>Review now ›</Text>
+                <Text style={styles.reviewBtnText}>{t("reviewNow")}</Text>
               </Pressable>
             )}
           </View>
         )}
 
         {/* ── Study section ────────────────────────────── */}
-        <Text style={styles.sectionLabel}>STUDY</Text>
+        <Text style={styles.sectionLabel}>{t("sectionStudy")}</Text>
         <View style={[styles.grid, isLargeScreen() && styles.gridWide]}>
-          {SECTION_LEARN.map((t) => (
-            <Tile key={t.key} config={t} onPress={() => go(t.key)} />
+          {SECTION_LEARN.map((tile) => (
+            <Tile key={tile.key} config={tile} t={t} onPress={() => go(tile.key)} />
           ))}
         </View>
 
         {/* ── Practice section ─────────────────────────── */}
-        <Text style={styles.sectionLabel}>PRACTICE</Text>
+        <Text style={styles.sectionLabel}>{t("sectionPractice")}</Text>
         <View style={[styles.grid, isLargeScreen() && styles.gridWide]}>
-          {SECTION_PRACTICE.map((t) => (
-            <Tile key={t.key} config={t} onPress={() => go(t.key)} />
+          {SECTION_PRACTICE.map((tile) => (
+            <Tile key={tile.key} config={tile} t={t} onPress={() => go(tile.key)} />
           ))}
         </View>
       </ScrollView>
@@ -137,17 +121,21 @@ export function HomeScreen({ go }: { go: (s: ScreenName) => void }) {
 }
 
 function Tile({
-  config: t,
+  config,
+  t,
   onPress,
 }: {
   config: TileConfig;
+  t: (key: StringKey) => string;
   onPress: () => void;
 }) {
+  const title = t(config.titleKey);
+  const desc = t(config.descKey);
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`${t.title}. ${t.desc}`}
+      accessibilityLabel={`${title}. ${desc}`}
       android_ripple={md.ripple(md.colors.onSurface)}
       style={({ pressed }) => [
         styles.tile,
@@ -156,13 +144,13 @@ function Tile({
       ]}
     >
       {/* Accent bar — clipped inside the tile via overflow:hidden */}
-      {t.accentColor && (
-        <View style={[styles.accentBar, { backgroundColor: t.accentColor }]} />
+      {config.accentColor && (
+        <View style={[styles.accentBar, { backgroundColor: config.accentColor }]} />
       )}
-      <Text style={styles.tileIcon}>{t.icon}</Text>
+      <Text style={styles.tileIcon}>{config.icon}</Text>
       <View style={styles.tileMeta}>
-        <Text style={styles.tileTitle}>{t.title}</Text>
-        <Text style={styles.tileDesc}>{t.desc}</Text>
+        <Text style={styles.tileTitle}>{title}</Text>
+        <Text style={styles.tileDesc}>{desc}</Text>
       </View>
       <Text style={styles.chevron} aria-hidden>›</Text>
     </Pressable>

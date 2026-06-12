@@ -108,3 +108,42 @@ export async function resetProgress(): Promise<void> {
   db = {};
   await persist();
 }
+
+/** All progress entries currently in the database. */
+export function allProgress(): PhraseProgress[] {
+  return Object.values(db);
+}
+
+/** Overall accuracy across all practiced phrases, 0..1 (null if nothing practiced yet). */
+export function overallAccuracy(): number | null {
+  const entries = allProgress();
+  const seen = entries.reduce((sum, e) => sum + e.seen, 0);
+  if (seen === 0) return null;
+  const correct = entries.reduce((sum, e) => sum + e.correct, 0);
+  return correct / seen;
+}
+
+function startOfDay(ms: number): number {
+  const d = new Date(ms);
+  d.setHours(0, 0, 0, 0);
+  return d.getTime();
+}
+
+/**
+ * Number of consecutive days (ending today) with at least one practiced phrase.
+ * Counts from `lastSeen` timestamps; a gap of a day or more ends the streak.
+ */
+export function streakDays(at: number = Date.now()): number {
+  const days = new Set(allProgress().map((e) => startOfDay(e.lastSeen)));
+  if (days.size === 0) return 0;
+  const DAY = 24 * 60 * 60 * 1000;
+  let day = startOfDay(at);
+  // If nothing was practiced today yet, the streak still counts up to yesterday.
+  if (!days.has(day)) day -= DAY;
+  let streak = 0;
+  while (days.has(day)) {
+    streak++;
+    day -= DAY;
+  }
+  return streak;
+}

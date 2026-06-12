@@ -9,9 +9,14 @@ import { listening } from "../data/content";
 const SESSION_SIZE = 8;
 import { colors, spacing } from "../theme";
 import { shuffle } from "../util";
+import { filterByLevel } from "../data/level";
+import { getLevelFilter } from "../progress/preferences";
 
 export function ListeningScreen({ onBack }: { onBack: () => void }) {
-  const [session] = useState(() => shuffle(listening).slice(0, SESSION_SIZE));
+  const [session] = useState(() => {
+    const pool = filterByLevel(listening, (item) => [item.say], getLevelFilter());
+    return shuffle(pool).slice(0, SESSION_SIZE);
+  });
   const [i, setI] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
   const [score, setScore] = useState(0);

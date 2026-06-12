@@ -8,11 +8,21 @@ import { scenes } from "../data/content";
 import { shuffle } from "../util";
 const SESSION_SIZE = 5;
 import { colors, font, radius, spacing } from "../theme";
+import { filterByLevel } from "../data/level";
+import { getLevelFilter } from "../progress/preferences";
+import { SceneVideo } from "../components/SceneVideo";
 
 const AVATARS = ["🧑", "👩", "👨", "🧓", "👱‍♀️", "👨‍🦰"];
 
 export function SceneScreen({ onBack }: { onBack: () => void }) {
-  const [session] = useState(() => shuffle(scenes).slice(0, SESSION_SIZE));
+  const [session] = useState(() => {
+    const pool = filterByLevel(
+      scenes,
+      (item) => [item.situation, ...item.lines.map((l) => l.text), item.question],
+      getLevelFilter()
+    );
+    return shuffle(pool).slice(0, SESSION_SIZE);
+  });
   const [i, setI] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [activeLine, setActiveLine] = useState(-1);
@@ -112,11 +122,15 @@ export function SceneScreen({ onBack }: { onBack: () => void }) {
         <H2 style={{ marginTop: spacing.md }}>{item.title}</H2>
         <Body style={{ color: colors.textSoft, marginTop: spacing.xs }}>{item.situation}</Body>
 
-        {/* The "scene": a speaking character with live subtitles */}
+        {/* The "scene": a real video clip if provided, else a speaking character — with live subtitles */}
         <View style={styles.stage}>
-          <Animated.Text style={[styles.avatar, { transform: [{ scale: pulse }] }]}>
-            {AVATARS[i % AVATARS.length]}
-          </Animated.Text>
+          {item.video ? (
+            <SceneVideo uri={item.video} playing={playing} />
+          ) : (
+            <Animated.Text style={[styles.avatar, { transform: [{ scale: pulse }] }]}>
+              {AVATARS[i % AVATARS.length]}
+            </Animated.Text>
+          )}
           <View style={styles.subtitleBox}>
             {subtitle ? (
               <>

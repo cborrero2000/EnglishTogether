@@ -7,11 +7,20 @@ import { speak, stopSpeaking } from "../speech/speech";
 import { dialogs } from "../data/content";
 import { colors, font, radius, spacing } from "../theme";
 import { shuffle } from "../util";
+import { filterByLevel } from "../data/level";
+import { getLevelFilter } from "../progress/preferences";
 
 const SESSION_SIZE = 4;
 
 export function DialogScreen({ onBack }: { onBack: () => void }) {
-  const [session] = useState(() => shuffle(dialogs).slice(0, SESSION_SIZE));
+  const [session] = useState(() => {
+    const pool = filterByLevel(
+      dialogs,
+      (item) => [...item.lines.map((l) => l.text), item.question],
+      getLevelFilter()
+    );
+    return shuffle(pool).slice(0, SESSION_SIZE);
+  });
   const [i, setI] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [activeLine, setActiveLine] = useState(-1);

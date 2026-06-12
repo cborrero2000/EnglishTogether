@@ -11,6 +11,8 @@ import {
   VoiceInfo,
 } from "../speech/speech";
 import { md } from "../theme";
+import { useLanguage } from "../i18n/useLanguage";
+import { getLevelFilter, setLevelFilter, LevelFilter, resetOnboarding } from "../progress/preferences";
 
 const SAMPLE = "Hello! This is how I sound. Nice to meet you.";
 
@@ -80,11 +82,13 @@ function groupVoices(voices: VoiceInfo[]): Map<string, VoiceInfo[]> {
   return groups;
 }
 
-export function SettingsScreen({ onBack }: { onBack: () => void }) {
+export function SettingsScreen({ onBack, go }: { onBack: () => void; go: (s: import("../navigation").ScreenName) => void }) {
   const voices = listVoices();
   const [selected, setSelected] = useState<string | null>(getPreferredVoiceId());
   const natural = hasNaturalVoice();
   const groups = groupVoices(voices);
+  const { t, lang, setLang } = useLanguage();
+  const [level, setLevel] = useState<LevelFilter>(getLevelFilter());
 
   function pick(v: VoiceInfo | null) {
     const id = v?.id ?? null;
@@ -93,11 +97,55 @@ export function SettingsScreen({ onBack }: { onBack: () => void }) {
     speak(SAMPLE, { voiceId: id ?? undefined });
   }
 
+  function pickLevel(next: LevelFilter) {
+    setLevel(next);
+    setLevelFilter(next);
+  }
+
+  function showTutorial() {
+    resetOnboarding().then(() => go("onboarding"));
+  }
+
   return (
     <Screen>
-      <ActivityHeader title="Voice" onBack={onBack} />
+      <ActivityHeader title={t("settingsScreenTitle")} onBack={onBack} />
       <ScrollView contentContainerStyle={{ paddingBottom: md.spacing.xxxl }}>
-        <Body style={{ color: md.colors.onSurfaceVariant, marginTop: md.spacing.md }}>
+        {/* ── App language ─────────────────────────────── */}
+        <Text style={styles.groupLabel}>{t("settingsLanguageTitle")}</Text>
+        <Body style={{ color: md.colors.onSurfaceVariant, marginTop: md.spacing.xs }}>
+          {t("settingsLanguageDesc")}
+        </Body>
+        <VoiceRow
+          label={t("languageEnglish")}
+          sublabel=""
+          natural={false}
+          selected={lang === "en"}
+          onPress={() => setLang("en")}
+        />
+        <VoiceRow
+          label={t("languageKorean")}
+          sublabel=""
+          natural={false}
+          selected={lang === "ko"}
+          onPress={() => setLang("ko")}
+        />
+
+        {/* ── Difficulty level ──────────────────────────── */}
+        <Text style={[styles.groupLabel, { marginTop: md.spacing.xl }]}>{t("settingsLevelTitle")}</Text>
+        <Body style={{ color: md.colors.onSurfaceVariant, marginTop: md.spacing.xs }}>
+          {t("settingsLevelDesc")}
+        </Body>
+        <VoiceRow label={t("levelAll")} sublabel="" natural={false} selected={level === "all"} onPress={() => pickLevel("all")} />
+        <VoiceRow label={t("levelBeginner")} sublabel="" natural={false} selected={level === "beginner"} onPress={() => pickLevel("beginner")} />
+        <VoiceRow label={t("levelIntermediate")} sublabel="" natural={false} selected={level === "intermediate"} onPress={() => pickLevel("intermediate")} />
+
+        {/* ── Tutorial ──────────────────────────────────── */}
+        <Text style={[styles.groupLabel, { marginTop: md.spacing.xl }]}>{t("settingsTutorialTitle")}</Text>
+        <Button title={t("settingsTutorialButton")} variant="neutral" onPress={showTutorial} style={{ marginTop: md.spacing.sm }} />
+
+        {/* ── Voice ─────────────────────────────────────── */}
+        <Text style={[styles.groupLabel, { marginTop: md.spacing.xl }]}>{t("settingsVoiceSection")}</Text>
+        <Body style={{ color: md.colors.onSurfaceVariant, marginTop: md.spacing.xs }}>
           Choose the voice you like best. Tap one to hear a sample.
         </Body>
 

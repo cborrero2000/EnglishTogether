@@ -13,6 +13,8 @@ import { conversations } from "../data/content";
 import { shuffle } from "../util";
 const SESSION_SIZE = 3;
 import { colors, font, radius, spacing } from "../theme";
+import { filterByLevel } from "../data/level";
+import { getLevelFilter } from "../progress/preferences";
 
 type Status = "idle" | "listening" | "good" | "retry";
 
@@ -25,7 +27,14 @@ function isAcceptable(accept: string[], said: string): boolean {
 }
 
 export function TalkBackScreen({ onBack }: { onBack: () => void }) {
-  const [session] = useState(() => shuffle(conversations).slice(0, SESSION_SIZE));
+  const [session] = useState(() => {
+    const pool = filterByLevel(
+      conversations,
+      (item) => item.steps.flatMap((s) => [s.prompt, s.expect]),
+      getLevelFilter()
+    );
+    return shuffle(pool).slice(0, SESSION_SIZE);
+  });
   const [convoIdx, setConvoIdx] = useState(0);
   const [step, setStep] = useState(0);
   const [status, setStatus] = useState<Status>("idle");

@@ -16,9 +16,14 @@ import { speaking } from "../data/content";
 import { shuffle } from "../util";
 const SESSION_SIZE = 10;
 import { colors, font, spacing } from "../theme";
+import { filterByLevel } from "../data/level";
+import { getLevelFilter } from "../progress/preferences";
 
 export function SpeakingScreen({ onBack }: { onBack: () => void }) {
-  const [session] = useState(() => shuffle(speaking).slice(0, SESSION_SIZE));
+  const [session] = useState(() => {
+    const pool = filterByLevel(speaking, (item) => [item.text], getLevelFilter());
+    return shuffle(pool).slice(0, SESSION_SIZE);
+  });
   const [i, setI] = useState(0);
   const [listening, setListening] = useState(false);
   const [heard, setHeard] = useState("");
