@@ -54,6 +54,8 @@ export function Button({
   loading,
   icon,
   style,
+  iconStyle,
+  textStyle,
   accessibilityLabel,
 }: {
   title: string;
@@ -63,6 +65,8 @@ export function Button({
   loading?: boolean;
   icon?: string;
   style?: ViewStyle;
+  iconStyle?: TextStyle;
+  textStyle?: TextStyle;
   accessibilityLabel?: string;
 }) {
   const bg =
@@ -96,10 +100,10 @@ export function Button({
       {loading ? (
         <ActivityIndicator color={fg} />
       ) : (
-        <Text style={[styles.btnText, { color: fg }]}>
-          {icon ? icon + "  " : ""}
-          {title}
-        </Text>
+        <>
+          {icon ? <Text style={[styles.btnIcon, { color: fg }, iconStyle]}>{icon}</Text> : null}
+          <Text style={[styles.btnText, { color: fg }, textStyle]}>{title}</Text>
+        </>
       )}
     </Pressable>
   );
@@ -111,11 +115,13 @@ export function ChoiceButton({
   onPress,
   state = "idle",
   disabled,
+  labelStyle,
 }: {
   label: string;
   onPress: () => void;
   state?: "idle" | "correct" | "wrong" | "dim";
   disabled?: boolean;
+  labelStyle?: TextStyle;
 }) {
   const bg =
     state === "correct"
@@ -147,7 +153,7 @@ export function ChoiceButton({
         },
       ]}
     >
-      <Text style={styles.choiceText}>{label}</Text>
+      <Text style={[styles.choiceText, labelStyle]}>{label}</Text>
       {state === "correct" && (
         <Text style={styles.markCorrect} accessibilityLabel="Correct">
           ✓
@@ -239,6 +245,10 @@ const styles = StyleSheet.create({
   btnText: {
     ...md.typescale.labelLarge,
     fontWeight: "700",
+  },
+  btnIcon: {
+    fontSize: md.typescale.labelLarge.fontSize,
+    marginRight: md.spacing.sm,
   },
 
   choice: {

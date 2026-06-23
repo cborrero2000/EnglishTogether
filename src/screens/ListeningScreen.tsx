@@ -7,7 +7,7 @@ import { speak, stopSpeaking } from "../speech/speech";
 import { listening } from "../data/content";
 
 const SESSION_SIZE = 8;
-import { colors, spacing } from "../theme";
+import { colors, spacing, md } from "../theme";
 import { shuffle } from "../util";
 import { filterByLevel } from "../data/level";
 import { getLevelFilter } from "../progress/preferences";
@@ -79,14 +79,18 @@ export function ListeningScreen({ onBack }: { onBack: () => void }) {
             title="Play again"
             icon="🔊"
             onPress={() => speak(item.say)}
-            style={{ marginTop: spacing.md, alignSelf: "stretch" }}
+            style={{ marginTop: spacing.md, alignSelf: "stretch", minHeight: 76 }}
+            iconStyle={{ fontSize: md.typescale.displaySmall.fontSize, marginRight: md.spacing.md }}
+            textStyle={{ fontSize: md.typescale.titleLarge.fontSize }}
           />
           <Button
             title="Slower"
             icon="🐢"
             variant="neutral"
             onPress={() => speak(item.say, { rate: 0.6 })}
-            style={{ marginTop: spacing.sm, alignSelf: "stretch" }}
+            style={{ marginTop: spacing.sm, alignSelf: "stretch", minHeight: 76 }}
+            iconStyle={{ fontSize: md.typescale.displaySmall.fontSize, marginRight: md.spacing.md }}
+            textStyle={{ fontSize: md.typescale.titleLarge.fontSize }}
           />
         </Card>
 
@@ -98,7 +102,16 @@ export function ListeningScreen({ onBack }: { onBack: () => void }) {
             else if (idx === picked) state = "wrong";
             else state = "dim";
           }
-          return <ChoiceButton key={idx} label={opt} state={state} disabled={picked != null} onPress={() => choose(idx)} />;
+          return (
+            <ChoiceButton
+              key={idx}
+              label={opt}
+              state={state}
+              disabled={picked != null}
+              onPress={() => choose(idx)}
+              labelStyle={{ fontSize: md.typescale.titleLarge.fontSize, lineHeight: md.typescale.titleLarge.lineHeight }}
+            />
+          );
         })}
 
         {picked != null && (

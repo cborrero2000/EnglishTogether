@@ -33,7 +33,7 @@ export function ActivityHeader({
             pressed && Platform.OS !== "android" && { opacity: 0.7 },
           ]}
         >
-          <Text style={styles.backArrow}>←</Text>
+          <Text style={styles.backArrow}>⬅️</Text>
           <Text style={styles.backLabel}>Menu</Text>
         </Pressable>
 
@@ -80,10 +80,10 @@ const styles = StyleSheet.create({
     minHeight: md.touchTarget.minHeight,
   },
   backArrow: {
-    fontSize: 22,
+    fontSize: 30,
     color: md.colors.onBackground,
-    marginRight: md.spacing.xs,
-    lineHeight: 26,
+    marginRight: md.spacing.sm,
+    lineHeight: 34,
   },
   backLabel: {
     ...md.typescale.labelLarge,
