@@ -70,9 +70,9 @@ export function ListeningScreen({ onBack }: { onBack: () => void }) {
   return (
     <Screen>
       <ActivityHeader title="Listen & Choose" onBack={onBack} step={i + 1} total={session.length} />
-      <ScrollView contentContainerStyle={{ paddingBottom: spacing.xl }}>
-        <Card style={{ marginTop: spacing.md, alignItems: "center" }}>
-          <Body style={{ color: colors.textSoft, textAlign: "center" }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: spacing.xl }}>
+        <Card style={{ marginTop: spacing.md, alignItems: "center", padding: md.spacing.md }}>
+          <Body style={{ color: md.colors.primary, fontWeight: "700", textAlign: "center" }}>
             Listen carefully, then choose the sentence you heard.
           </Body>
           <Button
@@ -94,7 +94,7 @@ export function ListeningScreen({ onBack }: { onBack: () => void }) {
           />
         </Card>
 
-        <H2 style={{ marginTop: spacing.lg, marginBottom: spacing.xs }}>Which did you hear?</H2>
+        <H2 style={{ marginTop: spacing.sm, marginBottom: spacing.xs }}>Which did you hear?</H2>
         {options.map((opt, idx) => {
           let state: "idle" | "correct" | "wrong" | "dim" = "idle";
           if (picked != null) {
@@ -113,22 +113,30 @@ export function ListeningScreen({ onBack }: { onBack: () => void }) {
             />
           );
         })}
-
-        {picked != null && (
-          <View style={{ marginTop: spacing.md }}>
-            <Body style={{ color: picked === answerIndex ? colors.correct : colors.wrong, fontWeight: "700" }}>
-              {picked === answerIndex ? "✓ Correct!" : "Not quite — the highlighted one is right."}
-            </Body>
-            <Button
-              title={i + 1 >= session.length ? "See results" : "Next"}
-              onPress={next}
-              style={{ marginTop: spacing.md }}
-            />
-          </View>
-        )}
       </ScrollView>
+
+      {picked != null && (
+        <View style={styles.footer}>
+          <Body style={{ color: picked === answerIndex ? colors.correct : colors.wrong, fontWeight: "700" }}>
+            {picked === answerIndex ? "✓ Correct!" : "Not quite — the highlighted one is right."}
+          </Body>
+          <Button
+            title={i + 1 >= session.length ? "See results" : "Next"}
+            onPress={next}
+            style={{ marginTop: spacing.md }}
+          />
+        </View>
+      )}
     </Screen>
   );
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  footer: {
+    borderTopWidth: 1,
+    borderTopColor: md.colors.outlineVariant,
+    paddingTop: md.spacing.md,
+    paddingBottom: md.spacing.lg,
+    backgroundColor: md.colors.background,
+  },
+});
