@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { Screen, Card, Body, Button, ChoiceButton, H2 } from "../components/UI";
 import { ActivityHeader } from "../components/ActivityHeader";
@@ -21,6 +21,7 @@ export function ListeningScreen({ onBack }: { onBack: () => void }) {
   const [picked, setPicked] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [done, setDone] = useState(false);
+  const scrollRef = useRef<ScrollView>(null);
 
   const item = session[i];
   // Shuffle the options once per question.
@@ -39,6 +40,9 @@ export function ListeningScreen({ onBack }: { onBack: () => void }) {
     if (picked != null) return;
     setPicked(idx);
     if (idx === answerIndex) setScore((s) => s + 1);
+    requestAnimationFrame(() => {
+      scrollRef.current?.scrollToEnd({ animated: true });
+    });
   }
 
   function next() {
@@ -70,7 +74,7 @@ export function ListeningScreen({ onBack }: { onBack: () => void }) {
   return (
     <Screen>
       <ActivityHeader title="Listen & Choose" onBack={onBack} step={i + 1} total={session.length} />
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: spacing.xl }}>
+      <ScrollView ref={scrollRef} style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: spacing.xl }}>
         <Card style={{ marginTop: spacing.md, alignItems: "center", padding: md.spacing.md }}>
           <Body style={{ color: md.colors.primary, fontWeight: "700", textAlign: "center" }}>
             Listen carefully, then choose the sentence you heard.
